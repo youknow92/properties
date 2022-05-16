@@ -30,7 +30,7 @@ spring:
             postLogger: true
       routes:
         - id: memberDetailInfo
-          uri: lb://MEMBER_DEMO
+          uri: http://localhost:8081/
           predicates:
             - Path=/member/detail-info
           filters:
@@ -44,7 +44,7 @@ spring:
                 preLogger: true
                 postLogger: true
         - id: test
-          uri: lb://MEMBER_DEMO
+          uri: http://localhost:8081/
           predicates:
             - Path=/member/**
           filters:
