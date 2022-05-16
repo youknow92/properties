@@ -3,7 +3,7 @@ server:
   shutdown: graceful
 
 instance:
-  pid: orchestration_api
+  pid: orchestration-api
 
 logging:
   file:
