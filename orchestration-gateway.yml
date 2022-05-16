@@ -70,6 +70,15 @@ spring:
               args:
                 name: failServiceCircuitBreaker
                 fallbackUri: forward:/serviceFallback
+        - id: orch
+          uri: http://localhost:8082/
+          predicates:
+            - Path=/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: orchServiceCircuitBreaker
+                fallbackUri: forward:/serviceFallback
 
       # TODO 리소스 서버 추가 필요
 
