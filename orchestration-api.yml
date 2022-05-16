@@ -21,6 +21,10 @@ logging:
 spring:
   application:
     name: ${instance.pid}
+  cloud:
+    config:
+      name: ${instance.pid}
+      profile: local
     gateway:
       default-filters:
         - name: Global
