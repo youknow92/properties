@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8082
   shutdown: graceful
 
 instance:
@@ -18,77 +18,15 @@ logging:
       max-file-size: 500MB
       clean-history-on-start: false
 
-spring:
-  application:
-    name: ${instance.pid}
-  cloud:
-    config:
-      name: ${instance.pid}
-      profile: local
-    gateway:
-      default-filters:
-        - name: Global
-          args:
-            baseMessage: Spring Cloud Gateway GlobalFilter
-            preLogger: true
-            postLogger: true
-      routes:
-        - id: memberDetailInfo
-          uri: http://localhost:8081/
-          predicates:
-            - Path=/member/detail-info
-          filters:
-            - name: CircuitBreaker
-              args:
-                name: memberDetailInfoServiceCircuitBreaker
-                fallbackUri: forward:/serviceFallback
-            - name: DetailInfo
-              args:
-                baseMessage: Spring Cloud Gateway Custom
-                preLogger: true
-                postLogger: true
-        - id: test
-          uri: http://localhost:8081/
-          predicates:
-            - Path=/member/**
-          filters:
-            - name: CircuitBreaker
-              args:
-                name: testServiceCircuitBreaker
-                fallbackUri: forward:/serviceFallback
-            - name: Custom
-              args:
-                baseMessage: Spring Cloud Gateway Custom
-                preLogger: true
-                postLogger: true
-        - id: fail
-          uri: http://192.168.123.11/
-          predicates:
-            - Path=/fail/**
-          filters:
-            - name: CircuitBreaker
-              args:
-                name: failServiceCircuitBreaker
-                fallbackUri: forward:/serviceFallback
-
-      # TODO 리소스 서버 추가 필요
-
-resilience4j:
-  circuitbreaker:
-    configs:
-      default:
-        minimum-number-of-calls: 60
-        sliding-window-size: 60
-        failure-rate-threshold: 50
-        wait-duration-in-open-state: 5000 # circuitbreaker OPEN
-  timelimiter:
-    configs:
-      default:
-        timeout-duration: 3s
-
 eureka:
   client:
     fetch-registry: true
     register-with-eureka: true
     service-url:
       defaultZone: http://127.0.0.1:8787/eureka
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh
