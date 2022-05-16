@@ -73,7 +73,7 @@ spring:
         - id: orch
           uri: http://localhost:8082/
           predicates:
-            - Path=/**
+            - Path=/orch/**
           filters:
             - name: CircuitBreaker
               args:
