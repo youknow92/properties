@@ -25,7 +25,6 @@ spring:
     config:
       name: ${instance.pid}
       profile: local
-    gateway:
       default-filters:
         - name: Global
           args:
@@ -33,60 +32,57 @@ spring:
             preLogger: true
             postLogger: true
       routes:
-        - id: memberDetailInfo
-          uri: http://localhost:8081/
+        - id: login
+          uri: http://localhost:8082
           predicates:
-            - Path=/member/detail-info
+            - Path=/orch/login
           filters:
+            - RewritePath=/orch/(?<path>.*), /orch
+            - name: OrchSync
+              args:
+                httpMethod: GET
+                url: http://localhost:8081/member/block
+                save: false
+            - name: OrchSync
+              args:
+                httpMethod: GET
+                url: http://localhost:8081/member/id
+                save: false
+            - name: OrchSync
+              args:
+                httpMethod: GET
+                url: http://localhost:8081/member/password
+                save: false
+            - name: OrchSync
+              args:
+                httpMethod: GET
+                url: http://localhost:8081/member/sfa-type
+                save: true
+            - name: CustomModifyRequestBody
             - name: CircuitBreaker
               args:
                 name: memberDetailInfoServiceCircuitBreaker
                 fallbackUri: forward:/serviceFallback
-            - name: DetailInfo
-              args:
-                baseMessage: Spring Cloud Gateway Custom
                 preLogger: true
                 postLogger: true
-        - id: test
-          uri: http://localhost:8081/
+        - id: myAsset
+          uri: http://localhost:8082
+          predicates:
+            - Path=/orch/my/asset
+          filters:
+            - RewritePath=/orch/(?<path>.*), /orch
+            - name: OrchAsync
+              args:
+                list: GET http://localhost:8081/member/info Y,GET http://localhost:8081/asset/info Y,GET http://localhost:8081/tradeinfo Y
+            - name: CustomModifyRequestBody
+        - id: memberInfo
+          uri: http://localhost:8081
           predicates:
             - Path=/member/**
           filters:
             - name: CircuitBreaker
               args:
-                name: testServiceCircuitBreaker
-                fallbackUri: forward:/serviceFallback
-            - name: Custom
-              args:
-                baseMessage: Spring Cloud Gateway Custom
-                preLogger: true
-                postLogger: true
-        - id: fail
-          uri: http://192.168.123.11/
-          predicates:
-            - Path=/fail/**
-          filters:
-            - name: CircuitBreaker
-              args:
-                name: failServiceCircuitBreaker
-                fallbackUri: forward:/serviceFallback
-        - id: orch
-          uri: http://localhost:8082/
-          predicates:
-            - Path=/orch/**
-          filters:
-            - name: CircuitBreaker
-              args:
-                name: orchServiceCircuitBreaker
-                fallbackUri: forward:/serviceFallback
-        - id: asset
-          uri: http://localhost:8081/
-          predicates:
-            - Path=/asset/**
-          filters:
-            - name: CircuitBreaker
-              args:
-                name: assetServiceCircuitBreaker
+                name: memberDetailInfoServiceCircuitBreaker
                 fallbackUri: forward:/serviceFallback
 
       # TODO 리소스 서버 추가 필요
